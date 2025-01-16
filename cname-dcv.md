@@ -1,4 +1,19 @@
 
+# Recommendations {#recommendations}
+
+## Validation Record Owner Name {#name}
+
+The RECOMMENDED format for a Validation Record's owner name is application-specific underscore prefix labels. Domain Control Validation Records are constructed by the Application Service Provider by prepending the label "`_<PROVIDER_RELEVANT_NAME>-challenge`" to the domain name being validated (e.g. "\_service-challenge.example.com"). The prefix "_" is used to avoid collisions with existing hostnames and to prevent the owner name from being a valid hostname.
+
+If an Application Service Provider has an application-specific need to have multiple validations for the same label, multiple prefixes can be used, such as "`_<FEATURE>._<PROVIDER_RELEVANT_NAME>-challenge`".
+
+An Application Service Provider may also specify prepending a random token to the owner name of a validation record, such as "`_<RANDOM_TOKEN>._<PROVIDER_RELEVANT_NAME>-challenge`". This can be done either as part of the challenge itself ({{cname-dcv}}), to support multiple Intermediaries ({{multiple}}), or to make it harder for a third party to scan what Application Service Providers are being used by a given domain name.
+
+## Time-bound checking
+
+
+One exception is if the record is being used as part of a delegated domain control validation setup ({{delegated}}); in that case, the CNAME record that points to the actual validation TXT record cannot be removed as long as the User is still relying on the Intermediary.
+
 # CNAME Records for Domain Control Validation {#cname-dcv}
 
 CNAME records MAY be used instead of TXT records where specified by Application Service Providers to support Users who are unable to create TXT records. Two forms of this are common: including the random token in the owner name of a validation record, or including the random token as a part of the CNAME target. This approach has a number of limitations relative to using TXT records.
@@ -60,3 +75,40 @@ or
 When performing validation, the Application Service Provider would resolve the DNS name containing the appropriate identifier token.
 
 Application Service Providers may wish to always prepend the `_<identifier-token>` to make it harder for third parties to scan, even absent supporting multiple intermediaries.  The `_<identifier-token>` MUST start with an underscore so as to not be a valid hostname.
+
+
+### CNAME based {#cname-examples}
+
+#### CNAME for Domain Control Validation {#cname-dcv-examples}
+
+##### DocuSign
+
+{{DOCUSIGN-CNAME}} asks the User to add a CNAME record with the "Host Name" set to be a 32-digit random value pointing to `verifydomain.docusign.net.`.
+
+##### Google Workspace
+
+{{GOOGLE-WORKSPACE-CNAME}} lets you specify a CNAME record for verifying domain ownership. The User gets a unique 12-character string that is added as "Host", with TTL 3600 (or default) and Destination an 86-character string beginning with "gv-" and ending with ".domainverify.googlehosted.com.".
+
+#### Delegated Domain Control Validation {#delegated-examples}
+
+##### Content Delivery Networks (CDNs): Akamai and Cloudflare
+
+In order to be issued a TLS cert from a Certification Authority like Let's Encrypt, the requester needs to prove that they control the domain. Often this is done via the {{DNS-01}} challenge. Let's Encrypt only issues certs with a 90 day validity period for security reasons {{LETSENCRYPT-90-DAYS-RENEWAL}}. This means that after 90 days, the DNS-01 challenge has to be re-done and the random token has to be replaced with a new one. Doing this manually is error-prone. Content Delivery Networks like Akamai and Cloudflare offer to automate this process using a CNAME record in the User's DNS that points to the Validation Record in the CDN's zone ({{AKAMAI-DELEGATED}} and {{CLOUDFLARE-DELEGATED}}).
+
+##### AWS Certificate Manager (ACM)
+
+AWS Certificate Manager {{ACM-CNAME}} allows delegated domain control validation {{delegated}}. The record name for the CNAME looks like:
+
+     _<random-token1>.example.com.  IN   CNAME _<random-token2>.acm-validations.aws.
+
+The CNAME points to:
+
+     _<random-token2>.acm-validations.aws.  IN   TXT "<random-token3>"
+
+Here, the random tokens are used for the following:
+
+* `<random-token1>`: Unique sub-domain, so there's no clashes when looking up the Validation Record.
+* `<random-token2>`: Proves to ACM that the requester controls the DNS for the requested domain at the time the CNAME is created.
+* `<random-token3>`: The actual token being verified.
+
+Note that if there are more than 5 CNAMEs being chained, then this method does not work.

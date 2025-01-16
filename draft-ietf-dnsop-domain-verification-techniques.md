@@ -307,7 +307,6 @@ The RECOMMENDED format for a Validation Record's owner name is application-speci
 
 If an Application Service Provider has an application-specific need to have multiple validations for the same label, multiple prefixes can be used, such as "`_<FEATURE>._<PROVIDER_RELEVANT_NAME>-challenge`".
 
-An Application Service Provider may also specify prepending a random token to the owner name of a validation record, such as "`_<RANDOM_TOKEN>._<PROVIDER_RELEVANT_NAME>-challenge`". This can be done either as part of the challenge itself ({{cname-dcv}}), to support multiple Intermediaries ({{multiple}}), or to make it harder for a third party to scan what Application Service Providers are being used by a given domain name.
 
 ### Scope Indication {#scope-indication}
 
@@ -353,8 +352,6 @@ This random token is placed in either the RDATA or an owner name, as described i
 After domain control validation is completed, there is typically no need for the TXT or CNAME record to continue to exist as the presence of the domain validation DNS record for a service only implies that a User with access to the service also has DNS control of the domain at the time the code was generated. It should be safe to remove the validation DNS record once the validation is done and the Application Service Provider doing the validation should specify how long the validation will take (i.e., after how much time can the validation DNS record be deleted).
 
 Some Application Service Providers currently require the Validation Record to remain in the zone indefinitely for periodic revalidation purposes. This practice should be discouraged. Subsequent validation actions using an already disclosed token are no guarantee that the original owner is still in control of the domain, and a new challenge needs to be issued.
-
-One exception is if the record is being used as part of a delegated domain control validation setup ({{delegated}}); in that case, the CNAME record that points to the actual validation TXT record cannot be removed as long as the User is still relying on the Intermediary.
 
 ## TTL Considerations
 
@@ -468,6 +465,10 @@ The Public Suffix List ({{PSL}}) asks for owners of private domains to authentic
 
     _psl.example.com.  IN TXT "https://github.com/publicsuffix/list/pull/100"
 
+### Atlassian
+
+Some services ask the DNS record to exist in perpetuity {{ATLASSIAN-VERIFY}}. If the record is removed, the User gets a limited amount of time to re-add it before they lose domain validation status.
+
 ### CNAME based {#cname-examples}
 
 #### CNAME for Domain Control Validation {#cname-dcv-examples}
@@ -488,7 +489,7 @@ In order to be issued a TLS cert from a Certification Authority like Let's Encry
 
 ##### AWS Certificate Manager (ACM)
 
-AWS Certificate Manager {{ACM-CNAME}} allows delegated domain control validation {{delegated}}. The record name for the CNAME looks like:
+AWS Certificate Manager {{ACM-CNAME}} allows delegated domain control validation. The record name for the CNAME looks like:
 
      _<random-token1>.example.com.  IN   CNAME _<random-token2>.acm-validations.aws.
 
@@ -504,13 +505,9 @@ Here, the random tokens are used for the following:
 
 Note that if there are more than 5 CNAMEs being chained, then this method does not work.
 
-#### Atlassian
+### Constraints on Domains and Subdomains {#constraint-examples}
 
-Some services ask the DNS record to exist in perpetuity {{ATLASSIAN-VERIFY}}. If the record is removed, the User gets a limited amount of time to re-add it before they lose domain validation status.
-
-#### Constraints on Domains and Subdomains {#constraint-examples}
-
-##### CAA records
+#### CAA records
 
 While the ACME protocol ([RFC8555]) specifies a way to demonstrate ownership over a given domain, Certification Authorities are required to use it in-conjunction with {{RFC8659}} that specifies CAA records. CAA allows a domain owner to apply policy across a domain and its subdomains to limit which Certification Authorities may issue certificates.
 
