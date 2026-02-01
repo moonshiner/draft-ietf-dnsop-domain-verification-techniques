@@ -54,7 +54,6 @@ informative:
     RFC3833:
     RFC3986:
     RFC5234:
-    RFC4086:
     RFC4343:
     RFC7132:
     RFC8555:
