@@ -202,7 +202,7 @@ Application Service Providers MUST validate that a Unique Token in the TXT recor
 
 ### Unique Token {#unique-token}
 
-A Unique Token is used in the challenge and is a value issued between parties (Application Service Provider to User, Application Service Provider to Intermediary, or Intermediary to User). The Unique Token MUST be constructed in a manner which has adequate uniqueness so as to guarantee a causal relationship between its issuance and its appearance in a DNS record. If multiple Application Service Providers are using the same Validation Record name then the Unique Token MUST be constructed in a way that prevents collisions.
+A Unique Token is used in the challenge and is a value issued between parties (Application Service Provider to User, Application Service Provider to Intermediary, or Intermediary to User). The Unique Token MUST be constructed in a manner which has adequate uniqueness so as to guarantee a causal relationship between its issuance and its appearance in a DNS record. To additionally safeguard against multiple Application Service Providers using the same Validation Record name, for example if a non-unique prefix is used, the Unique Token MUST be constructed in a way that prevents collisions.
 
 Examples of Unique Token construction include:
 
