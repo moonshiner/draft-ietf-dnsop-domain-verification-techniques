@@ -46,14 +46,15 @@ author:
 normative:
   RFC1034:
   RFC2119:
+  RFC2308:
   RFC8174:
   RFC9364:
+  RFC5234:
   RFC4035:
 
 informative:
     RFC3833:
     RFC3986:
-    RFC5234:
     RFC4086:
     RFC4343:
     RFC7132:
@@ -293,7 +294,7 @@ The User SHOULD de-provision the resource record provisioned for DNS-based domai
 
 The TTL {{RFC1034}} for Validation Records SHOULD be short to allow recovering from potential misconfigurations. These records will not be polled frequently so expected caching or resolver load will be limited during normal operations.
 
-The Application Service Provider looking up a Validation Record may have to wait for up to the SOA minimum TTL (negative caching TTL) of the enclosing zone for the record to become visible, if it has been previously queried. If the application User wants to make the Validation Record visible more quickly they may need to work with the DNS Administrator to see if they are willing to lower the SOA minimum TTL (which has implications across the entire zone).
+The Application Service Provider looking up a Validation Record may have to wait for up to the SOA minimum TTL (negative caching TTL) {{RFC2308}} of the enclosing zone for the record to become visible, if it has been previously queried. If the application User wants to make the Validation Record visible more quickly they may need to work with the DNS Administrator to see if they are willing to lower the SOA minimum TTL (which has implications across the entire zone).
 
 Application Service Providers' verifiers MAY use dedicated DNS resolvers configured with a low maximum negative caching TTL, flush Validation Records from resolver caches prior to issuing queries or just directly query authoritative name servers to avoid caching.
 
