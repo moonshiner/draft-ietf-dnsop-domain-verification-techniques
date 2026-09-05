@@ -279,7 +279,7 @@ Application Service Providers MUST provide clear instructions on how long the ch
 
 The instructions for validity duration MAY be encoded in the RDATA as token metadata ({{metadata}}) using the key "expiry" to hold a time after which it is safe to remove the Validation Record. For example:
 
-    _example_service-challenge.example.com.  IN   TXT  "token=3419...3d206c4 expiry=2023-02-08"
+    _example_service-challenge.example.com.  IN   TXT  "token=3419...3d206c4 expiry=2026-02-08"
 
 When an expiry time is specified, the value of "expiry" SHALL be in ISO 8601 format as specified in {{!RFC3339, Section 5.6}}.
 
@@ -339,17 +339,17 @@ Application Service Providers may wish to always prepend the `_<identifier-uniqu
 
 # Security Considerations
 
-## Token Collisions
+## Token Confusion
 
-If token values aren't long enough, lack adequate entropy, or are not unique there's a risk that a malicious actor could obtain a token that collides with one already present in a domain through repeated attempts (H1 in {{threat-ul1}}).
+If token values in challenge labels ({{multiple}}) are not long enough or lack adequate entropy there is a risk that a malicious actor could produce a token that could be confused with an application-specific underscore prefix label (H6 in {{threat-ul2}})
+
+## Token Collision
+
+If token values are not long enough, lack adequate entropy, or are not unique there is a risk that a malicious actor could obtain a token that collides with one already present in a domain through repeated attempts (H1 in {{threat-ul1}}).
 
 Application Service Providers MUST evaluate the threat model for their particular application to determine a token construction mechanism that guarantees uniqueness and meets their security requirements (UL1 in {{threat-model}}).
 
-When Random Tokens are used, they MUST be constructed in a way that provides sufficient unpredictability to avoid collisions and brute force attacks.
-
-## Token Confusion
-
-If token values in challenge labels ({{multiple}}) aren't long enough or lack adequate entropy there's a risk that a malicious actor could produce a token that could be confused with an application-specific underscore prefix label (H6 in {{threat-ul2}}).
+When Random Tokens are used, they MUST be constructed in a way that provides sufficient unpredictability to avoid collisions and brute force attacks
 
 ## Service Confusion {#service-confusion}
 
@@ -362,7 +362,7 @@ As a corollary to {{service-confusion}}, if the Validation Record is not well-sc
 
 ## Scope Confusion
 
-Ambiguity of scope introduces risks, as described in {{scope}}. Distinguishing the scope in the application-specific label, along with good documentation, should help make it clear to DNS Administrators whether the record applies to a single hostname, a wildcard, or an entire domain. Always using this indication rather than having a default scope reduces ambiguity, especially for protocols that may have used a shared application-specific label for different scopes in the past. While it would also have been possible to include the scope as an attribute in the TXT record, that has more potential for ambiguity and misleading an operator, such as if an implementation ignores an attribute it doesn't recognize but an attacker includes the attribute to mislead the DNS Administrator. (H5 in {{threat-model}})
+Ambiguity of scope introduces risks, as described in {{scope}}. Distinguishing the scope in the application-specific label, along with good documentation, should help make it clear to DNS Administrators whether the record applies to a single hostname, a wildcard, or an entire domain. Always using this indication rather than having a default scope reduces ambiguity, especially for protocols that may have used a shared application-specific label for different scopes in the past. While it would also have been possible to include the scope as an attribute in the TXT record, that has more potential for ambiguity and misleading an operator, such as if an implementation ignores an attribute it does not recognize but an attacker includes the attribute to mislead the DNS Administrator. (H5 in {{threat-model}})
 
 ## Authenticated Channels
 
@@ -398,7 +398,7 @@ Whether it is appropriate to allow domain verification on a public suffix will d
 
 ## Unintentional Persistence
 
-When persistent domain validation is used, a DNS Administrator failing to remove a no-longer desired Validation Record could enable a User to continue to have access to the domain within the Application Service Provider's service. (H4 in {{threat-ul1}})
+When persistent domain validation is used, a DNS Administrator failing to remove a no longer desired Validation Record could enable a User to continue to have access to the domain within the Application Service Provider's service. (H4 in {{threat-ul1}})
 
 When one-off domain validation is used, this is typically implemented through automation where a DNS Administrator grants the User access to make updates to the domain's zone configuration. If the DNS Administrator fails to revoke access to a User who should no longer have access, this would enable the User to continue to perform new validations.
 
@@ -438,7 +438,7 @@ Additionally, placing many such TXT records at the same name increases the size 
 
 Other possible issues may occur. If a TXT record (or any other record type) is designed to be placed at the same domain name that is being validated, it may not be possible to do so if that name already has a CNAME record. This is because CNAME records cannot co-exist with other (non-DNSSEC) records at the same name. This situation cannot occur at the apex of a DNS zone, but can at a name deeper within the zone.
 
-When multiple distinct services specify placing Validation Records at the same owner name, there is no way to delegate an application specific domain Validation Record to a third party. Furthermore, even without delegation, an organization may have a shared DNS zone where they need to provide record level permissions to the specific division within the organization that is responsible for the application in question. This can't be done if all applications expect to find Validation Records at the same name.
+When multiple distinct services specify placing Validation Records at the same owner name, there is no way to delegate an application specific domain Validation Record to a third party. Furthermore, even without delegation, an organization may have a shared DNS zone where they need to provide record level permissions to the specific division within the organization that is responsible for the application in question. This can not be done if all applications expect to find Validation Records at the same name.
 
 
 ## Domain Boundaries {#domain-boundaries}
